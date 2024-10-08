@@ -2,13 +2,51 @@ syntax = "proto3";
 option go_package = "ITUServer/grpc/proto";
 //To make a go.mod do this command
 //go mod init <name>
-message Students {
-    repeated string students = 1;
+message Server_publish_message { //The cheep message returned to all users 
+    int32 t = 1;
+    string message = 2; //SHOULD HAVE LIMIT 128 charachters
+}
+
+message Client_publish_message {
+    int32 t = 1;
+    string message = 2; //SHOULD HAVE LIMIT 128 charachters
+}
+
+message Client_has_joined {
+    int32 t = 1;
+}
+
+message Server_client_has_joined {
+    int32 t = 1;
+    string message = 2; //Format: "Participant X  joined Chitty-Chat at Lamport time L"
+}
+
+message Client_has_left {
+    int32 t = 1;
+}
+
+message Server_client_has_left {
+    int32 t = 1;
+    string message = 2; //Format: "Participant X left Chitty-Chat at Lamport time L"
 }
 
 message Empty {}
 
+
 //Think of this as a interface for the server, we define endpoints here
-service ITUDatabase {
-    rpc GetStudents (Empty) returns (Students) {};
+service ChittyChat {
+    rpc ClientJoin (Client_has_joined) returns (Empty) {};
+
+    rpc ClientLeft (Client_has_left) returns (Empty) {};
+
+    rpc ClientSaid (Client_publish_message) returns (Empty) {};
+}
+
+
+service Client {
+    rpc ClientJoin (Server_client_has_joined) returns (Empty) {};
+
+    rpc ClientLeft (Server_client_has_left) returns (Empty) {};
+
+    rpc ClientSaid (Server_publish_message) returns (Empty) {};
 }
