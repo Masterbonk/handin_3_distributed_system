@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = "ITUServer/grpc/proto";
+//To make a go.mod do this command
+//go mod init <name>
+message Students {
+    repeated string students = 1;
+}
+
+message Empty {}
+
+//Think of this as a interface for the server, we define endpoints here
+service ITUDatabase {
+    rpc GetStudents (Empty) returns (Students) {};
+}
