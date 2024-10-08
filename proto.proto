@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "ITUServer/grpc/proto";
+option go_package = "Server/grpc/proto";
 //To make a go.mod do this command
 //go mod init <name>
 message Server_publish_message { //The cheep message returned to all users 

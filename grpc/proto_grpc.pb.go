@@ -19,105 +19,359 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ITUDatabase_GetStudents_FullMethodName = "/ITUDatabase/GetStudents"
+	ChittyChat_ClientJoin_FullMethodName = "/ChittyChat/ClientJoin"
+	ChittyChat_ClientLeft_FullMethodName = "/ChittyChat/ClientLeft"
+	ChittyChat_ClientSaid_FullMethodName = "/ChittyChat/ClientSaid"
 )
 
-// ITUDatabaseClient is the client API for ITUDatabase service.
+// ChittyChatClient is the client API for ChittyChat service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // Think of this as a interface for the server, we define endpoints here
-type ITUDatabaseClient interface {
-	GetStudents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Students, error)
+type ChittyChatClient interface {
+	ClientJoin(ctx context.Context, in *ClientHasJoined, opts ...grpc.CallOption) (*Empty, error)
+	ClientLeft(ctx context.Context, in *ClientHasLeft, opts ...grpc.CallOption) (*Empty, error)
+	ClientSaid(ctx context.Context, in *ClientPublishMessage, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type iTUDatabaseClient struct {
+type chittyChatClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewITUDatabaseClient(cc grpc.ClientConnInterface) ITUDatabaseClient {
-	return &iTUDatabaseClient{cc}
+func NewChittyChatClient(cc grpc.ClientConnInterface) ChittyChatClient {
+	return &chittyChatClient{cc}
 }
 
-func (c *iTUDatabaseClient) GetStudents(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Students, error) {
+func (c *chittyChatClient) ClientJoin(ctx context.Context, in *ClientHasJoined, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Students)
-	err := c.cc.Invoke(ctx, ITUDatabase_GetStudents_FullMethodName, in, out, cOpts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, ChittyChat_ClientJoin_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ITUDatabaseServer is the server API for ITUDatabase service.
-// All implementations must embed UnimplementedITUDatabaseServer
+func (c *chittyChatClient) ClientLeft(ctx context.Context, in *ClientHasLeft, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, ChittyChat_ClientLeft_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *chittyChatClient) ClientSaid(ctx context.Context, in *ClientPublishMessage, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, ChittyChat_ClientSaid_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ChittyChatServer is the server API for ChittyChat service.
+// All implementations must embed UnimplementedChittyChatServer
 // for forward compatibility.
 //
 // Think of this as a interface for the server, we define endpoints here
-type ITUDatabaseServer interface {
-	GetStudents(context.Context, *Empty) (*Students, error)
-	mustEmbedUnimplementedITUDatabaseServer()
+type ChittyChatServer interface {
+	ClientJoin(context.Context, *ClientHasJoined) (*Empty, error)
+	ClientLeft(context.Context, *ClientHasLeft) (*Empty, error)
+	ClientSaid(context.Context, *ClientPublishMessage) (*Empty, error)
+	mustEmbedUnimplementedChittyChatServer()
 }
 
-// UnimplementedITUDatabaseServer must be embedded to have
+// UnimplementedChittyChatServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedITUDatabaseServer struct{}
+type UnimplementedChittyChatServer struct{}
 
-func (UnimplementedITUDatabaseServer) GetStudents(context.Context, *Empty) (*Students, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetStudents not implemented")
+func (UnimplementedChittyChatServer) ClientJoin(context.Context, *ClientHasJoined) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientJoin not implemented")
 }
-func (UnimplementedITUDatabaseServer) mustEmbedUnimplementedITUDatabaseServer() {}
-func (UnimplementedITUDatabaseServer) testEmbeddedByValue()                     {}
+func (UnimplementedChittyChatServer) ClientLeft(context.Context, *ClientHasLeft) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientLeft not implemented")
+}
+func (UnimplementedChittyChatServer) ClientSaid(context.Context, *ClientPublishMessage) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientSaid not implemented")
+}
+func (UnimplementedChittyChatServer) mustEmbedUnimplementedChittyChatServer() {}
+func (UnimplementedChittyChatServer) testEmbeddedByValue()                    {}
 
-// UnsafeITUDatabaseServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ITUDatabaseServer will
+// UnsafeChittyChatServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ChittyChatServer will
 // result in compilation errors.
-type UnsafeITUDatabaseServer interface {
-	mustEmbedUnimplementedITUDatabaseServer()
+type UnsafeChittyChatServer interface {
+	mustEmbedUnimplementedChittyChatServer()
 }
 
-func RegisterITUDatabaseServer(s grpc.ServiceRegistrar, srv ITUDatabaseServer) {
-	// If the following call pancis, it indicates UnimplementedITUDatabaseServer was
+func RegisterChittyChatServer(s grpc.ServiceRegistrar, srv ChittyChatServer) {
+	// If the following call pancis, it indicates UnimplementedChittyChatServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ITUDatabase_ServiceDesc, srv)
+	s.RegisterService(&ChittyChat_ServiceDesc, srv)
 }
 
-func _ITUDatabase_GetStudents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _ChittyChat_ClientJoin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientHasJoined)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ITUDatabaseServer).GetStudents(ctx, in)
+		return srv.(ChittyChatServer).ClientJoin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ITUDatabase_GetStudents_FullMethodName,
+		FullMethod: ChittyChat_ClientJoin_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ITUDatabaseServer).GetStudents(ctx, req.(*Empty))
+		return srv.(ChittyChatServer).ClientJoin(ctx, req.(*ClientHasJoined))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ITUDatabase_ServiceDesc is the grpc.ServiceDesc for ITUDatabase service.
+func _ChittyChat_ClientLeft_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientHasLeft)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChittyChatServer).ClientLeft(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChittyChat_ClientLeft_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChittyChatServer).ClientLeft(ctx, req.(*ClientHasLeft))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ChittyChat_ClientSaid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientPublishMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChittyChatServer).ClientSaid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChittyChat_ClientSaid_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChittyChatServer).ClientSaid(ctx, req.(*ClientPublishMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ChittyChat_ServiceDesc is the grpc.ServiceDesc for ChittyChat service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ITUDatabase_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ITUDatabase",
-	HandlerType: (*ITUDatabaseServer)(nil),
+var ChittyChat_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ChittyChat",
+	HandlerType: (*ChittyChatServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetStudents",
-			Handler:    _ITUDatabase_GetStudents_Handler,
+			MethodName: "ClientJoin",
+			Handler:    _ChittyChat_ClientJoin_Handler,
+		},
+		{
+			MethodName: "ClientLeft",
+			Handler:    _ChittyChat_ClientLeft_Handler,
+		},
+		{
+			MethodName: "ClientSaid",
+			Handler:    _ChittyChat_ClientSaid_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto.proto",
+}
+
+const (
+	Client_ClientJoin_FullMethodName = "/Client/ClientJoin"
+	Client_ClientLeft_FullMethodName = "/Client/ClientLeft"
+	Client_ClientSaid_FullMethodName = "/Client/ClientSaid"
+)
+
+// ClientClient is the client API for Client service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ClientClient interface {
+	ClientJoin(ctx context.Context, in *ServerClientHasJoined, opts ...grpc.CallOption) (*Empty, error)
+	ClientLeft(ctx context.Context, in *ServerClientHasLeft, opts ...grpc.CallOption) (*Empty, error)
+	ClientSaid(ctx context.Context, in *ServerPublishMessage, opts ...grpc.CallOption) (*Empty, error)
+}
+
+type clientClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewClientClient(cc grpc.ClientConnInterface) ClientClient {
+	return &clientClient{cc}
+}
+
+func (c *clientClient) ClientJoin(ctx context.Context, in *ServerClientHasJoined, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Client_ClientJoin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientClient) ClientLeft(ctx context.Context, in *ServerClientHasLeft, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Client_ClientLeft_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientClient) ClientSaid(ctx context.Context, in *ServerPublishMessage, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Client_ClientSaid_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ClientServer is the server API for Client service.
+// All implementations must embed UnimplementedClientServer
+// for forward compatibility.
+type ClientServer interface {
+	ClientJoin(context.Context, *ServerClientHasJoined) (*Empty, error)
+	ClientLeft(context.Context, *ServerClientHasLeft) (*Empty, error)
+	ClientSaid(context.Context, *ServerPublishMessage) (*Empty, error)
+	mustEmbedUnimplementedClientServer()
+}
+
+// UnimplementedClientServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedClientServer struct{}
+
+func (UnimplementedClientServer) ClientJoin(context.Context, *ServerClientHasJoined) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientJoin not implemented")
+}
+func (UnimplementedClientServer) ClientLeft(context.Context, *ServerClientHasLeft) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientLeft not implemented")
+}
+func (UnimplementedClientServer) ClientSaid(context.Context, *ServerPublishMessage) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientSaid not implemented")
+}
+func (UnimplementedClientServer) mustEmbedUnimplementedClientServer() {}
+func (UnimplementedClientServer) testEmbeddedByValue()                {}
+
+// UnsafeClientServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ClientServer will
+// result in compilation errors.
+type UnsafeClientServer interface {
+	mustEmbedUnimplementedClientServer()
+}
+
+func RegisterClientServer(s grpc.ServiceRegistrar, srv ClientServer) {
+	// If the following call pancis, it indicates UnimplementedClientServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&Client_ServiceDesc, srv)
+}
+
+func _Client_ClientJoin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ServerClientHasJoined)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServer).ClientJoin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Client_ClientJoin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServer).ClientJoin(ctx, req.(*ServerClientHasJoined))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Client_ClientLeft_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ServerClientHasLeft)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServer).ClientLeft(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Client_ClientLeft_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServer).ClientLeft(ctx, req.(*ServerClientHasLeft))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Client_ClientSaid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ServerPublishMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServer).ClientSaid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Client_ClientSaid_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServer).ClientSaid(ctx, req.(*ServerPublishMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Client_ServiceDesc is the grpc.ServiceDesc for Client service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Client_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Client",
+	HandlerType: (*ClientServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ClientJoin",
+			Handler:    _Client_ClientJoin_Handler,
+		},
+		{
+			MethodName: "ClientLeft",
+			Handler:    _Client_ClientLeft_Handler,
+		},
+		{
+			MethodName: "ClientSaid",
+			Handler:    _Client_ClientSaid_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
