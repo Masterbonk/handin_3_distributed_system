@@ -13,8 +13,17 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+func addToLamport(inputLamport int32, ourLamport *int32) {
+	if inputLamport > *ourLamport {
+		*ourLamport = inputLamport
+	}
+	*ourLamport++
+}
+
 func main() {
 	var username string
+
+	var lamport int32 = 0
 
 	flag.StringVar(&username, "u", "anonymous", "Set the client username. Defaults to anonymous")
 	flag.Parse()
@@ -57,25 +66,28 @@ func main() {
 		log.Fatalf("client.RouteChat failed: %v", err)
 	}
 	waitc := make(chan struct{})
-	go func() {
+	go func(lamport *int32) {
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
 				// read done.
 				close(waitc)
 				return
+			} else{
+				addToLamport(in.Lamport, lamport)
 			}
 
 			if in.MessageType == 0 {
-				fmt.Printf("%s\n", in.Msg)
+				fmt.Printf("Time: %d, %s\n",*lamport, in.Msg)
 			} else if in.MessageType == 1 {
-				fmt.Printf("%s: %s\n", in.ClientName, in.Msg)
+				fmt.Printf("Time: %d, %s: %s\n",*lamport, in.ClientName, in.Msg)
 			}
 		}
-	}()
+	}(&lamport)
 
 	for _, msg := range testMessages {
 		err := stream.Send(msg)
+		lamport++
 		if err != nil {
 			log.Fatalf("client.RouteChat: stream.Send(%v) failed: %v", msg, err)
 		}
