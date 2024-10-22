@@ -2,11 +2,14 @@ package main
 
 import (
 	cc "ChittyChat/ChittyChat"
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"google.golang.org/grpc"
@@ -28,7 +31,7 @@ func main() {
 	flag.StringVar(&username, "u", "anonymous", "Set the client username. Defaults to anonymous")
 	flag.Parse()
 
-	testMessages := []*cc.ClientMessage{
+	/*testMessages := []*cc.ClientMessage{
 		{Msg: "First message", ClientName: username},
 		{Msg: "Second message", ClientName: username},
 		{Msg: "Third message", ClientName: username},
@@ -37,6 +40,7 @@ func main() {
 		{Msg: "the message that is 128 charachters long. the message that is 128 charachters long. the message that is 128 charachters long. the message that is 128 charachters long. ", ClientName: username},
 
 	}
+	*/
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -55,9 +59,10 @@ func main() {
 	client := cc.NewChittyChatClient(conn)
 
 	// create contect, cancel when function terminates
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	clientDeadline := time.Now().Add(time.Duration(20) * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2000*time.Second)
+	/*clientDeadline := time.Now().Add(time.Duration(20) * time.Second)
 	ctx, cancel = context.WithDeadline(ctx, clientDeadline)
+	*/
 
 	defer cancel()
 
@@ -75,26 +80,45 @@ func main() {
 				// read done.
 				close(waitc)
 				return
-			} else{
-				addToLamport(in.Lamport, lamport)
+			} else {
+				//addToLamport(in.Lamport, lamport)
 			}
 
 			if in.MessageType == 0 {
-				fmt.Printf("Time: %d, %s\n",*lamport, in.Msg)
+				fmt.Printf("Time: %d, %s\n", *lamport, in.Msg)
 			} else if in.MessageType == 1 {
-				fmt.Printf("Time: %d, %s: %s\n",*lamport, in.ClientName, in.Msg)
+				fmt.Printf("Time: %d, %s: %s\n", *lamport, in.ClientName, in.Msg)
 			}
 		}
 	}(&lamport)
 
-	for _, msg := range testMessages {
-		err := stream.Send(msg)
-		lamport++
-		if err != nil {
-			log.Fatalf("client.RouteChat: stream.Send(%v) failed: %v", msg, err)
+	waitb := make(chan struct{})
+
+	go func(lamport *int32) {
+		reader := bufio.NewReader(os.Stdin)
+		for {
+			text, _ := reader.ReadString('\n')
+
+			if text == "shutdown" {
+				fmt.Println("Shutdown was detected")
+				break
+			}
+			// convert CRLF to LF
+			text = strings.Replace(text, "\n", "", -1)
+
+			temp := &cc.ClientMessage{Msg: text, ClientName: username}
+
+			err := stream.Send(temp)
+			*lamport++
+			if err != nil {
+				log.Fatalf("client.RouteChat: stream.Send(%v) failed: %v", text, err)
+			}
+
 		}
-		time.Sleep(time.Second * 3)
-	}
+		close(waitb)
+	}(&lamport)
+	<-waitb
+
 	stream.CloseSend()
 	fmt.Println("Close")
 	<-waitc

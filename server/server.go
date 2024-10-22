@@ -39,7 +39,7 @@ func (s *server) broadcast(lam int32, msg string, clientName string, messageType
 	addToLamport(lam, &s.lamport)
 
 	fmt.Printf("Time: %d, %s: %s\n",s.lamport, clientName, msg)
-
+	
 }
 
 func addToLamport(inputLamport int32, ourLamport *int32) {
