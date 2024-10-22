@@ -33,9 +33,13 @@ func (s *server) broadcast(lam int32, msg string, clientName string, messageType
 
 		if err := ss.Send(&cc.ServerMessage{Lamport: s.lamport, Msg: msg, ClientName: clientName, MessageType: messageType}); err != nil {
 			log.Printf("broadcast err %s: %v", clientName, err)
-		}
+		} 
 	}
+
 	addToLamport(lam, &s.lamport)
+
+	fmt.Printf("Time: %d, %s: %s\n",s.lamport, clientName, msg)
+
 }
 
 func addToLamport(inputLamport int32, ourLamport *int32) {
@@ -119,10 +123,11 @@ func (s *server) getClients() []cc.ChittyChat_ChatServer {
 
 func main() {
 	port := 50051
-
+	ip := "localhost"
+	//ip := "192.168.43.80"
 
 	// listen to port
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d",ip, port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	} else {
