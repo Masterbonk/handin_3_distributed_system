@@ -54,19 +54,22 @@ func main() {
 		log.Fatalf("client.RouteChat failed: %v", err)
 	}
 
-	waitc := make(chan struct{})
 	go func() {
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
 				// read done.
-				close(waitc)
 				return
 			}
 			if err != nil {
 				log.Fatalf("client.RouteChat failed: %v", err)
 			}
-			fmt.Printf("%s: %s\n", in.ClientName, in.Msg)
+
+			if in.MessageType == 0 {
+				fmt.Printf("%s\n", in.Msg)
+			} else if in.MessageType == 1 {
+				fmt.Printf("%s: %s\n", in.ClientName, in.Msg)
+			}
 		}
 	}()
 	for _, msg := range testMessages {
@@ -74,8 +77,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("client.RouteChat: stream.Send(%v) failed: %v", msg, err)
 		}
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Millisecond * 500)
 	}
 	stream.CloseSend()
-	<-waitc
 }
