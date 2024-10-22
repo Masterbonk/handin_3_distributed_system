@@ -34,6 +34,8 @@ func main() {
 		{Msg: "Third message", ClientName: username},
 		{Msg: "Fourth message", ClientName: username},
 		{Msg: "Fifth message", ClientName: username},
+		{Msg: "the message that is 128 charachters long. the message that is 128 charachters long. the message that is 128 charachters long. the message that is 128 charachters long. ", ClientName: username},
+
 	}
 
 	var opts []grpc.DialOption

@@ -25,6 +25,9 @@ type server struct {
 // MessageType 0 is client joined/left
 // MessageType 1 is client post
 func (s *server) broadcast(lam int32, msg string, clientName string, messageType int32) {
+	if len(msg) > 128{
+		msg = msg[1:128]
+	}
 
 	for _, ss := range s.getClients() {
 
@@ -52,7 +55,6 @@ func (s *server) addClient(uid int, in cc.ClientMessage, srv cc.ChittyChat_ChatS
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.clients[uid] = srv
-	fmt.Println(s.lamport)
 	var msg string = fmt.Sprintf("Participant %s joined Chitty-Chat at Lamport time %d", in.ClientName, s.lamport)
 	s.broadcast(s.lamport, msg, in.ClientName, 0)
 }
