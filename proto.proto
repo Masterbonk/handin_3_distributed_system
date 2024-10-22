@@ -21,6 +21,10 @@ message Server_client_has_joined {
     string message = 2; //Format: "Participant X  joined Chitty-Chat at Lamport time L"
 }
 
+message Server_clients_id {
+    int32 id = 1;
+}
+
 message Client_has_left {
     int32 t = 1;
 }
@@ -35,7 +39,7 @@ message Empty {}
 
 //Think of this as a interface for the server, we define endpoints here
 service ChittyChat {
-    rpc ClientJoin (Client_has_joined) returns (Empty) {};
+    rpc ClientJoin (Client_has_joined) returns (Server_clients_id) {};
 
     rpc ClientLeft (Client_has_left) returns (Empty) {};
 
