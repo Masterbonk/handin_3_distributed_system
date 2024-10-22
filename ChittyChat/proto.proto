@@ -1,0 +1,26 @@
+syntax = "proto3";
+option go_package = "ChittyChat/ChittyChat";
+
+message ClientMessage {
+    int32 lamport = 1;
+    string msg = 2;
+    string clientName = 3;
+}
+
+message ServerMessage {
+    int32 lamport = 1;
+    string msg = 2;
+    string clientName = 3;
+    int32 messageType = 4;
+}
+
+message ClientEventMessage {
+    string clientName = 1;
+}
+
+message Empty {}
+
+// Interface exposed by the server
+service ChittyChat {
+    rpc Chat (stream ClientMessage) returns (stream ServerMessage) {};
+}
