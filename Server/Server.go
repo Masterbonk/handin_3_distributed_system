@@ -46,33 +46,53 @@ func (s *Chitty_databaseServer) start_server() {
 	}
 }
 
-func (s *Chitty_databaseServer) ClientJoin(ctx context.Context, in *proto.ClientHasJoined) (*proto.Empty, error) {
+func (s *Chitty_databaseServer) ClientJoin(ctx context.Context, in *proto.ClientHasJoined) (*proto.ServerClientsId, error) {
 	s.time++
 
 	for _, clientId := range s.clientId {
-		EstablishConnection(5050+clientId, 1, clientId, s.time)
+		EstablishConnection(5050+clientId, 1, clientId, s.time, "")
 	}
 
 	s.clientId = append(s.clientId, s.nextClientId)
 
 	s.nextClientId++
 
-	return (s.nextClientId - 1), nil
-
+	return &proto.ServerClientsId{Id: int32(s.nextClientId - 1)}, nil
 }
 
 func (s *Chitty_databaseServer) ClientLeft(ctx context.Context, in *proto.ClientHasLeft) (*proto.Empty, error) {
 	s.time++
 
 	for _, clientId := range s.clientId {
-		EstablishConnection(5050+clientId, 2, clientId, s.time)
+		EstablishConnection(5050+clientId, 2, clientId, s.time, "")
+	}
+
+	for i := 0; i < len(s.clientId); i++ {
+		if s.clientId[i] == int(in.Id) {
+			s.clientId = remove(s.clientId, i)
+		}
 	}
 
 	return &proto.Empty{}, nil
-
 }
 
-func EstablishConnection(port, state, clientId int, time int32) {
+// https://stackoverflow.com/a/37335777
+func remove(s []int, i int) []int {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func (s *Chitty_databaseServer) ClientSaid(ctx context.Context, in *proto.ClientPublishMessage) (*proto.Empty, error) {
+	s.time++
+
+	for _, clientId := range s.clientId {
+		EstablishConnection(5050+clientId, 3, clientId, s.time, in.Message)
+	}
+
+	return &proto.Empty{}, nil
+}
+
+func EstablishConnection(port, state, clientId int, time int32, message string) {
 	conn, err := grpc.NewClient("localhost:"+strconv.Itoa(port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Not working 3")
@@ -86,6 +106,9 @@ func EstablishConnection(port, state, clientId int, time int32) {
 
 	} else if state == 2 { //ClientLeft has been called
 		ClientLeftProces(client, clientId, time)
+
+	} else if state == 3 { //ClientSaid has been called
+		ClientSaidProces(client, clientId, time, message)
 
 	}
 
@@ -107,6 +130,17 @@ func ClientLeftProces(client proto.ClientClient, clientId int, time int32) {
 	_, err := client.ClientLeft(context.Background(),
 		&proto.ServerClientHasLeft{T: time,
 			Message: "Participant " + strconv.Itoa(clientId) + " left Chitty-Chat at Lamport time " + strconv.Itoa(int(time))})
+
+	if err != nil {
+		log.Fatalf("Not working 4")
+	}
+}
+
+func ClientSaidProces(client proto.ClientClient, clientId int, time int32, message string) {
+
+	_, err := client.ClientSaid(context.Background(),
+		&proto.ServerPublishMessage{T: time,
+			Message: "Participant " + strconv.Itoa(clientId) + " said this: \"" + message + "\" at timestamp " + strconv.Itoa(int(time))})
 
 	if err != nil {
 		log.Fatalf("Not working 4")

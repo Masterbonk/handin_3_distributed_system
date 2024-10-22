@@ -30,7 +30,7 @@ const (
 //
 // Think of this as a interface for the server, we define endpoints here
 type ChittyChatClient interface {
-	ClientJoin(ctx context.Context, in *ClientHasJoined, opts ...grpc.CallOption) (*Empty, error)
+	ClientJoin(ctx context.Context, in *ClientHasJoined, opts ...grpc.CallOption) (*ServerClientsId, error)
 	ClientLeft(ctx context.Context, in *ClientHasLeft, opts ...grpc.CallOption) (*Empty, error)
 	ClientSaid(ctx context.Context, in *ClientPublishMessage, opts ...grpc.CallOption) (*Empty, error)
 }
@@ -43,9 +43,9 @@ func NewChittyChatClient(cc grpc.ClientConnInterface) ChittyChatClient {
 	return &chittyChatClient{cc}
 }
 
-func (c *chittyChatClient) ClientJoin(ctx context.Context, in *ClientHasJoined, opts ...grpc.CallOption) (*Empty, error) {
+func (c *chittyChatClient) ClientJoin(ctx context.Context, in *ClientHasJoined, opts ...grpc.CallOption) (*ServerClientsId, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(ServerClientsId)
 	err := c.cc.Invoke(ctx, ChittyChat_ClientJoin_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (c *chittyChatClient) ClientSaid(ctx context.Context, in *ClientPublishMess
 //
 // Think of this as a interface for the server, we define endpoints here
 type ChittyChatServer interface {
-	ClientJoin(context.Context, *ClientHasJoined) (*Empty, error)
+	ClientJoin(context.Context, *ClientHasJoined) (*ServerClientsId, error)
 	ClientLeft(context.Context, *ClientHasLeft) (*Empty, error)
 	ClientSaid(context.Context, *ClientPublishMessage) (*Empty, error)
 	mustEmbedUnimplementedChittyChatServer()
@@ -92,7 +92,7 @@ type ChittyChatServer interface {
 // pointer dereference when methods are called.
 type UnimplementedChittyChatServer struct{}
 
-func (UnimplementedChittyChatServer) ClientJoin(context.Context, *ClientHasJoined) (*Empty, error) {
+func (UnimplementedChittyChatServer) ClientJoin(context.Context, *ClientHasJoined) (*ServerClientsId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClientJoin not implemented")
 }
 func (UnimplementedChittyChatServer) ClientLeft(context.Context, *ClientHasLeft) (*Empty, error) {

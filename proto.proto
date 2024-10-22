@@ -27,6 +27,7 @@ message Server_clients_id {
 
 message Client_has_left {
     int32 t = 1;
+    int32 id = 2;
 }
 
 message Server_client_has_left {
