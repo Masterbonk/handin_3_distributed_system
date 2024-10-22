@@ -81,7 +81,7 @@ func main() {
 				close(waitc)
 				return
 			} else {
-				//addToLamport(in.Lamport, lamport)
+				addToLamport(in.Lamport, lamport)
 			}
 
 			if in.MessageType == 0 {
@@ -95,9 +95,9 @@ func main() {
 	waitb := make(chan struct{})
 
 	go func(lamport *int32) {
-		reader := bufio.NewReader(os.Stdin)
-		for {
-			text, _ := reader.ReadString('\n')
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan(){
+			text := scanner.Text()
 
 			if text == "shutdown" {
 				fmt.Println("Shutdown was detected")
