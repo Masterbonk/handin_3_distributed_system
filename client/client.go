@@ -44,7 +44,10 @@ func main() {
 	client := cc.NewChittyChatClient(conn)
 
 	// create contect, cancel when function terminates
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	clientDeadline := time.Now().Add(time.Duration(20) * time.Second)
+	ctx, cancel = context.WithDeadline(ctx, clientDeadline)
+
 	defer cancel()
 
 	stream, err := client.Chat(ctx)
@@ -53,16 +56,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("client.RouteChat failed: %v", err)
 	}
-
+	waitc := make(chan struct{})
 	go func() {
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
 				// read done.
+				close(waitc)
 				return
-			}
-			if err != nil {
-				log.Fatalf("client.RouteChat failed: %v", err)
 			}
 
 			if in.MessageType == 0 {
@@ -72,12 +73,15 @@ func main() {
 			}
 		}
 	}()
+
 	for _, msg := range testMessages {
 		err := stream.Send(msg)
 		if err != nil {
 			log.Fatalf("client.RouteChat: stream.Send(%v) failed: %v", msg, err)
 		}
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Second * 3)
 	}
 	stream.CloseSend()
+	fmt.Println("Close")
+	<-waitc
 }
