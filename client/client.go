@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"context"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -31,16 +30,6 @@ func main() {
 	flag.StringVar(&username, "u", "anonymous", "Set the client username. Defaults to anonymous")
 	flag.Parse()
 
-	/*testMessages := []*cc.ClientMessage{
-		{Msg: "First message", ClientName: username},
-		{Msg: "Second message", ClientName: username},
-		{Msg: "Third message", ClientName: username},
-		{Msg: "Fourth message", ClientName: username},
-		{Msg: "Fifth message", ClientName: username},
-		{Msg: "the message that is 128 charachters long. the message that is 128 charachters long. the message that is 128 charachters long. the message that is 128 charachters long. ", ClientName: username},
-
-	}
-	*/
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -85,9 +74,9 @@ func main() {
 			}
 
 			if in.MessageType == 0 {
-				fmt.Printf("Time: %d, %s\n", *lamport, in.Msg)
+				log.Printf("Time: %d, %s\n", *lamport, in.Msg)
 			} else if in.MessageType == 1 {
-				fmt.Printf("Time: %d, %s: %s\n", *lamport, in.ClientName, in.Msg)
+				log.Printf("Time: %d, %s: %s\n", *lamport, in.ClientName, in.Msg)
 			}
 		}
 	}(&lamport)
@@ -100,7 +89,7 @@ func main() {
 			text := scanner.Text()
 
 			if text == "shutdown" {
-				fmt.Println("Shutdown was detected")
+				log.Println("Shutdown was detected")
 				break
 			}
 			// convert CRLF to LF
@@ -120,6 +109,6 @@ func main() {
 	<-waitb
 
 	stream.CloseSend()
-	fmt.Println("Close")
+	log.Println("Close")
 	<-waitc
 }

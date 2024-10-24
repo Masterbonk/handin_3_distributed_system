@@ -38,7 +38,7 @@ func (s *server) broadcast(lam int32, msg string, clientName string, messageType
 
 	addToLamport(lam, &s.lamport)
 
-	fmt.Printf("Time: %d, %s: %s\n",s.lamport, clientName, msg)
+	log.Printf("Time: %d, %s: %s\n",s.lamport, clientName, msg)
 	
 }
 
@@ -131,7 +131,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	} else {
-		fmt.Printf("Now listening to port: %d", port)
+		log.Printf("Now listening to port: %d", port)
 	}
 
 	grpcServer := grpc.NewServer()
