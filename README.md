@@ -9,6 +9,7 @@ The terminal will write *Now listening to port: 50051* once the server is up and
 
 Now one can connect with other terminals as clients. This can be done by writing the following command in the other terminal:
 `go run client/client.go`
+
 This will create a user called anouminous. One is able to add a flag to specify ones name, using '-u name', so the following command will start a client with the name Tom:
 `go run client/client.go -u Tom`
 
