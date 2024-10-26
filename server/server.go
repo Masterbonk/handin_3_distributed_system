@@ -25,6 +25,8 @@ type server struct {
 // MessageType 0 is client joined/left
 // MessageType 1 is client post
 func (s *server) broadcast(lam int32, msg string, clientName string, messageType int32) {
+	addToLamport(lam, &s.lamport)
+
 	if len(msg) > 128{
 		msg = msg[1:128]
 	}
@@ -36,7 +38,6 @@ func (s *server) broadcast(lam int32, msg string, clientName string, messageType
 		} 
 	}
 
-	addToLamport(lam, &s.lamport)
 
 	log.Printf("Time: %d, %s: %s\n",s.lamport, clientName, msg)
 	

@@ -97,8 +97,8 @@ func main() {
 
 			temp := &cc.ClientMessage{Msg: text, ClientName: username}
 
-			err := stream.Send(temp)
 			*lamport++
+			err := stream.Send(temp)
 			if err != nil {
 				log.Fatalf("client.RouteChat: stream.Send(%v) failed: %v", text, err)
 			}
